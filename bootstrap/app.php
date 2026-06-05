@@ -12,6 +12,10 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        // Derrière le proxy HTTPS d'un PaaS (Railway, Render…), faire confiance
+        // aux en-têtes X-Forwarded-* pour générer des URLs/assets en https.
+        $middleware->trustProxies(at: '*');
+
         // Alias pour protéger les routes par rôle : ->middleware('role:organizer')
         $middleware->alias([
             'role' => \App\Http\Middleware\EnsureUserHasRole::class,
