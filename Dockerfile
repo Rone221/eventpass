@@ -14,12 +14,17 @@ RUN npm ci && npm run build
 # ---- Étape 2 : application PHP ----
 FROM php:8.2-cli-alpine AS app
 
-# Extensions PHP requises (sqlite, gd pour les QR codes, etc.)
-RUN apk add --no-cache \
-        git unzip libzip-dev oniguruma-dev \
-        libpng-dev libjpeg-turbo-dev freetype-dev icu-dev \
+# Librairies runtime + outils (gardés dans l'image finale)
+RUN apk add --no-cache git unzip libpng libjpeg-turbo freetype libzip oniguruma
+
+# Extensions PHP : on installe les deps de compilation ($PHPIZE_DEPS = gcc, make,
+# autoconf…) en virtuel, on compile, puis on les retire pour garder l'image légère.
+RUN apk add --no-cache --virtual .build-deps \
+        $PHPIZE_DEPS \
+        libpng-dev libjpeg-turbo-dev freetype-dev libzip-dev oniguruma-dev \
     && docker-php-ext-configure gd --with-jpeg --with-freetype \
-    && docker-php-ext-install pdo pdo_sqlite mbstring gd zip bcmath \
+    && docker-php-ext-install -j"$(nproc)" pdo pdo_sqlite mbstring gd zip bcmath \
+    && apk del .build-deps \
     && rm -rf /var/cache/apk/*
 
 # Composer
