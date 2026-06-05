@@ -12,6 +12,12 @@ class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
+        // Idempotent : ne rien faire si les données de démo existent déjà
+        // (le seeder est rejoué à chaque déploiement).
+        if (User::where('email', 'organisateur@eventpass.test')->exists()) {
+            return;
+        }
+
         /* ─── Comptes de démonstration ─── */
         $organizer = User::create([
             'name' => 'Awa Diop (Organisatrice)',
