@@ -1,0 +1,54 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ───────────────────────── Base ───────────────────────── */
+@layer base {
+    html { -webkit-font-smoothing: antialiased; }
+    body { @apply bg-white text-ink-700; }
+    h1, h2, h3, h4 { @apply font-display text-ink-900; }
+
+    /* Champs de formulaire cohérents avec la marque */
+    [type='text'], [type='email'], [type='password'], [type='number'],
+    [type='datetime-local'], [type='tel'], [type='search'], select, textarea {
+        @apply rounded-lg border-ink-200 text-ink-900 shadow-sm;
+    }
+    [type='text']:focus, [type='email']:focus, [type='password']:focus,
+    [type='number']:focus, [type='datetime-local']:focus, [type='tel']:focus,
+    [type='search']:focus, select:focus, textarea:focus {
+        @apply border-brand-400 ring-brand-400;
+    }
+}
+
+/* ─────────────────────── Composants ─────────────────────── */
+@layer components {
+
+    /* Boutons */
+    .btn { @apply inline-flex items-center justify-center gap-2 rounded-full font-semibold transition focus:outline-none focus:ring-2 focus:ring-offset-2; }
+    .btn-brand { @apply btn bg-brand-500 text-white px-6 py-3 hover:bg-brand-600 focus:ring-brand-400 shadow-sm; }
+    .btn-ink   { @apply btn bg-ink-900 text-white px-6 py-3 hover:bg-ink-800 focus:ring-ink-700; }
+    .btn-outline { @apply btn border border-ink-200 text-ink-800 px-6 py-3 hover:border-ink-900 hover:bg-ink-50 focus:ring-ink-300; }
+    .btn-ghost { @apply btn text-ink-600 px-4 py-2 hover:text-brand-600 hover:bg-brand-50; }
+    .btn-sm { @apply px-4 py-2 text-sm; }
+
+    /* Cartes */
+    .card { @apply bg-white rounded-2xl border border-ink-100 shadow-card; }
+    .card-pad { @apply card p-6; }
+
+    /* Chips / pills */
+    .chip { @apply inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-medium; }
+    .chip-soft { @apply chip bg-ink-50 text-ink-700 border border-ink-100; }
+    .chip-brand { @apply chip bg-brand-50 text-brand-700; }
+
+    /* Badges de statut */
+    .badge { @apply inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold; }
+
+    /* Labels de formulaire */
+    .label { @apply block text-sm font-semibold text-ink-800 mb-1.5; }
+
+    /* Lien discret */
+    .link { @apply text-brand-600 font-medium hover:text-brand-700 hover:underline; }
+
+    /* Conteneur de page */
+    .container-app { @apply max-w-6xl mx-auto px-4 sm:px-6 lg:px-8; }
+}
