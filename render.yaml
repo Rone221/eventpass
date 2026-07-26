@@ -1,0 +1,53 @@
+# ─────────────────────────────────────────────────────────────
+#  EventPass — Blueprint de déploiement Render (offre gratuite)
+#  Render lit ce fichier, construit le Dockerfile et injecte les
+#  variables d'environnement ci-dessous avant de lancer docker/start.sh.
+# ─────────────────────────────────────────────────────────────
+services:
+  - type: web
+    name: eventpass
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    plan: free
+    region: frankfurt        # datacenter le plus proche du Sénégal
+    branch: master
+    autoDeploy: true
+    envVars:
+      # --- Clé d'application : à renseigner dans le dashboard Render ---
+      - key: APP_KEY
+        sync: false
+      # --- URL publique : à mettre après le 1er déploiement (https://<ton-app>.onrender.com) ---
+      - key: APP_URL
+        sync: false
+
+      - key: APP_NAME
+        value: EventPass
+      - key: APP_ENV
+        value: production
+      - key: APP_DEBUG
+        value: "false"
+
+      # --- Base SQLite (fichier sur le disque du conteneur) ---
+      - key: DB_CONNECTION
+        value: sqlite
+      - key: DB_DATABASE
+        value: /app/storage/database.sqlite
+
+      # --- Sessions / cache en base (tables créées par les migrations) ---
+      - key: SESSION_DRIVER
+        value: database
+      - key: CACHE_STORE
+        value: database
+
+      # --- Queue en SYNCHRONE : pas de worker sur l'offre gratuite,
+      #     les billets doivent se générer pendant la requête IPN ---
+      - key: QUEUE_CONNECTION
+        value: sync
+
+      # --- Emails écrits dans les logs (pas de serveur SMTP) ---
+      - key: MAIL_MAILER
+        value: log
+
+      # --- Mode simulateur de paiement pour la démo (sans clés Paydunya) ---
+      - key: PAYMENT_FAKE_GATEWAY
+        value: "true"

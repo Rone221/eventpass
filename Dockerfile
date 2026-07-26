@@ -14,19 +14,14 @@ RUN npm ci && npm run build
 # ---- Étape 2 : application PHP ----
 FROM php:8.2-cli-alpine AS app
 
-# Librairies runtime + outils (gardés dans l'image finale)
-RUN apk add --no-cache git unzip libpng libjpeg-turbo freetype libzip oniguruma sqlite-libs
+# Outils runtime gardés dans l'image finale.
+RUN apk add --no-cache git unzip
 
-# Extensions PHP : on installe les deps de compilation ($PHPIZE_DEPS = gcc, make,
-# autoconf…) en virtuel, on compile, puis on les retire pour garder l'image légère.
-# Note : depuis PHP 8.2, pdo_sqlite nécessite la lib système sqlite (sqlite-dev).
-RUN apk add --no-cache --virtual .build-deps \
-        $PHPIZE_DEPS \
-        libpng-dev libjpeg-turbo-dev freetype-dev libzip-dev oniguruma-dev sqlite-dev \
-    && docker-php-ext-configure gd --with-jpeg --with-freetype \
-    && docker-php-ext-install -j"$(nproc)" pdo pdo_sqlite mbstring gd zip bcmath \
-    && apk del .build-deps \
-    && rm -rf /var/cache/apk/*
+# Extensions PHP via install-php-extensions : il gère automatiquement toutes les
+# libs système et deps de compilation nécessaires (gcc, make, headers…), puis
+# nettoie derrière lui. Bien plus fiable que le apk manuel + docker-php-ext-install.
+COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr/local/bin/
+RUN install-php-extensions pdo pdo_sqlite mbstring gd zip bcmath
 
 # Composer
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
